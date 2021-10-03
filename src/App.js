@@ -111,7 +111,7 @@ class App extends React.Component {
             currentList: newCurrentList,
             sessionData: prevState.sessionData
         }), () => {
-            // ANY AFTER EFFECTS?
+            // ANY AFTER EFFECTS? ya so after effects should be that the workspace is updated? How do i do that tho?
         });
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
@@ -142,7 +142,8 @@ class App extends React.Component {
         let modal = document.getElementById("delete-modal");
         modal.classList.remove("is-visible");
     }
-    render() {
+    render() { //so I'm assuming that this render does the big boy work of constantly rendering the application
+        //console.log(this.state.currentList);
         return (
             <div id="app-root">
                 <Banner 

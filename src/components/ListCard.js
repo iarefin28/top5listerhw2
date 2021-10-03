@@ -51,7 +51,6 @@ export default class ListCard extends React.Component {
 
     render() {
         const { keyNamePair, selected } = this.props;
-
         if (this.state.editActive) {
             return (
                 <input
@@ -65,11 +64,13 @@ export default class ListCard extends React.Component {
                 />)
         }
         else {
-
             let selectClass = "unselected-list-card";
             if (selected) {
                 selectClass = "selected-list-card";
             }
+            //selectClass = "selected-list-card";
+            //sooo in the span section the name of the list is added 
+            //get rid of the span section you will have no name list but still have the outline of an empty box, which comes from className 
             return (
                 <div
                     id={keyNamePair.key}

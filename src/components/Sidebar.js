@@ -31,8 +31,13 @@ export default class Sidebar extends React.Component {
                             deleteListCallback={deleteListCallback}
                             loadListCallback={loadListCallback}
                             renameListCallback={renameListCallback}
-                        />
-                    ))
+                        /> 
+                    )) 
+
+                    /*<ListCard
+                        key={2}
+                        keyNamePair = {keyNamePairs[2]}
+                        /> */
                 }
                 </div>
             </div>
