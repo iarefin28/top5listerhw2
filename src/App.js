@@ -104,6 +104,23 @@ class App extends React.Component {
             this.db.mutationUpdateSessionData(this.state.sessionData);
         });
     }
+    renameItem = (item_number, newName) => {
+        let currentList = this.state.currentList;
+        currentList.items[item_number] = newName;
+        
+        this.setState(prevState => ({
+            currentList: prevState.currentList,
+        }), () => {
+            // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
+            // THE TRANSACTION STACK IS CLEARED
+            let list = this.db.queryGetList(currentList.key);
+            list.items[item_number] = newName;
+            this.db.mutationUpdateList(list);
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+        });
+    }
+
+
     // THIS FUNCTION BEGINS THE PROCESS OF LOADING A LIST FOR EDITING
     loadList = (key) => {
         let newCurrentList = this.db.queryGetList(key);
@@ -111,7 +128,7 @@ class App extends React.Component {
             currentList: newCurrentList,
             sessionData: prevState.sessionData
         }), () => {
-            // ANY AFTER EFFECTS? ya so after effects should be that the workspace is updated? How do i do that tho?
+            // ANY AFTER EFFECTS?
         });
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
@@ -142,8 +159,7 @@ class App extends React.Component {
         let modal = document.getElementById("delete-modal");
         modal.classList.remove("is-visible");
     }
-    render() { //so I'm assuming that this render does the big boy work of constantly rendering the application
-        //console.log(this.state.currentList);
+    render() {
         return (
             <div id="app-root">
                 <Banner 
@@ -159,7 +175,9 @@ class App extends React.Component {
                     renameListCallback={this.renameList}
                 />
                 <Workspace
-                    currentList={this.state.currentList} />
+                    currentList={this.state.currentList} 
+                    renameItemCallback={this.renameItem}
+                />
                 <Statusbar 
                     currentList={this.state.currentList} />
                 <DeleteModal
