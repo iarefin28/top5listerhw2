@@ -159,6 +159,33 @@ class App extends React.Component {
         let modal = document.getElementById("delete-modal");
         modal.classList.remove("is-visible");
     }
+
+    moveItems = (item1, item2) => {
+        let currentList = this.state.currentList;
+        let currentListItems = this.state.currentList.items;
+        let indexOfFirst = 0;
+        let indexOfSecond = 0;
+        for (let i = 0; i < currentListItems.length; i++) {
+            if (currentListItems[i] == item1) {
+                indexOfFirst = i;
+            }
+            if (currentListItems[i] == item2) {
+                indexOfSecond = i;
+            }
+        }
+
+        currentListItems.splice(indexOfSecond, 0, currentListItems.splice(indexOfFirst, 1)[0]);
+        this.setState(prevState => ({
+            currentList: prevState.currentList,
+        }), () => {
+            // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
+            // THE TRANSACTION STACK IS CLEARED
+            let list = this.db.queryGetList(currentList.key);
+            list.items = currentListItems;
+            this.db.mutationUpdateList(list);
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+        });
+    }
     render() {
         return (
             <div id="app-root">
@@ -177,6 +204,7 @@ class App extends React.Component {
                 <Workspace
                     currentList={this.state.currentList} 
                     renameItemCallback={this.renameItem}
+                    moveItemsCallback={this.moveItems}
                 />
                 <Statusbar 
                     currentList={this.state.currentList} />

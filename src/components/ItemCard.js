@@ -41,11 +41,14 @@ export default class ItemCard extends React.Component {
     }
 
     onDragStart = (event) => {
-        //console.log(event.target)
+        //console.log(event.target.textContent);
+        event.dataTransfer.setData("text/plain", event.target.textContent);
     }
 
     dragOver = (event) => {
         event.stopPropagation();
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
     }
 
     dragEnter = (event) => {
@@ -57,9 +60,15 @@ export default class ItemCard extends React.Component {
     }
 
     dragLeave = (event) => {
-        //console.log(event.target)
         event.target.style.backgroundColor = "#e1e4cb";
     }
+
+    onDrop = (event) => {
+        event.preventDefault();
+        event.target.style.backgroundColor = "#e1e4cb";
+        let id = event.dataTransfer.getData("text/plain");
+        this.props.moveItemsCallback(id, event.target.textContent);
+    } 
 
     render(){
         const{currentList, item_number} = this.props;
@@ -86,6 +95,7 @@ export default class ItemCard extends React.Component {
                         onDragOver={this.dragOver}
                         onDragEnter={this.dragEnter}
                         onDragLeave={this.dragLeave}
+                        onDrop={this.onDrop}
                     >{this.props.currentList.items[this.props.item_number]}</div>
             )
         }
