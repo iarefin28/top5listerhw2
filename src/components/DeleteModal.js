@@ -13,8 +13,7 @@ export default class DeleteModal extends Component {
                 id="delete-modal"
                 data-animation="slideInOutLeft">
                 <div className="modal-dialog">
-                    <header className="dialog-header">
-                        Delete the {name} ALLMIGHT List?
+                    <header id="dialog" className="dialog-header">
                     </header>
                     <div id="confirm-cancel-container">
                         <button

@@ -141,18 +141,24 @@ class App extends React.Component {
             // ANY AFTER EFFECTS?
         });
     }
-    deleteList = () => {
+    deleteList = (listToDelete) => {
         // SOMEHOW YOU ARE GOING TO HAVE TO FIGURE OUT
         // WHICH LIST IT IS THAT THE USER WANTS TO
         // DELETE AND MAKE THAT CONNECTION SO THAT THE
         // NAME PROPERLY DISPLAYS INSIDE THE MODAL
-        this.showDeleteListModal();
+        //listToDelete contains the Object of the list to delete
+        this.showDeleteListModal(listToDelete.name);
     }
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
     // TO SEE IF THEY REALLY WANT TO DELETE THE LIST
-    showDeleteListModal() {
+    showDeleteListModal(name) {
         let modal = document.getElementById("delete-modal");
         modal.classList.add("is-visible");
+        let dialogBox = document.getElementById("dialog");
+        let newDialog = "Delete the ";
+        newDialog = newDialog + name;
+        newDialog = newDialog + " List?";
+        dialogBox.innerHTML = newDialog;
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
     hideDeleteListModal() {
