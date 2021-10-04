@@ -14,41 +14,32 @@ export default class Workspace extends React.Component {
                         <div className="item-number">4.</div>
                         <div className="item-number">5.</div>
                     </div>
-                    <div className="top5-item">
-                        <ItemCard
-                            currentList = {this.props.currentList}
-                            item_number = {0}
-                            renameItemCallback = {renameItemCallback}
-                        />
-                    </div>
-                    <div className="top5-item">
-                        <ItemCard
-                            currentList = {this.props.currentList}
-                            item_number = {1}
-                            renameItemCallback = {renameItemCallback}
-                        />
-                    </div>
-                    <div className="top5-item">
-                        <ItemCard
-                            currentList = {this.props.currentList}
-                            item_number = {2}
-                            renameItemCallback = {renameItemCallback}
-                        />
-                    </div> 
-                    <div className="top5-item">
-                        <ItemCard
-                            currentList = {this.props.currentList}
-                            item_number = {3}
-                            renameItemCallback = {renameItemCallback}
-                        />
-                    </div> 
-                    <div className="top5-item">
-                        <ItemCard
-                            currentList = {this.props.currentList}
-                            item_number = {4}
-                            renameItemCallback = {renameItemCallback}
-                        />
-                    </div>  
+                    <ItemCard
+                        currentList = {this.props.currentList}
+                        item_number = {0}
+                        renameItemCallback = {renameItemCallback}
+                    />
+                    <ItemCard
+                        currentList = {this.props.currentList}
+                        item_number = {1}
+                        renameItemCallback = {renameItemCallback}
+                    />
+                    <ItemCard
+                        currentList = {this.props.currentList}
+                        item_number = {2}
+                        renameItemCallback = {renameItemCallback}
+                    />
+                    <ItemCard
+                        currentList = {this.props.currentList}
+                        item_number = {3}
+                        renameItemCallback = {renameItemCallback}
+                    />
+                    <ItemCard
+                        currentList = {this.props.currentList}
+                        item_number = {4}
+                        renameItemCallback = {renameItemCallback}
+                    />
+             
                 </div>
             </div>
         )

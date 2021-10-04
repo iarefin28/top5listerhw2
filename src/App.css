@@ -197,6 +197,7 @@ body {
 
 .item-number,
 .top5-item,
+.top5-item-text,
 .top5-item-dragged-to {
   display: flex;
   align-items: center;
@@ -217,12 +218,10 @@ input {
   font-size: 20pt;
 }
 
-.top5-item-text {
-  align-items: center;
-}
 .top5-item,
+.top5-item-text,
 .top5-item-dragged-to {
-  text-align: center;
+  text-align: left;
   width: 75%;
   padding-left: 25%;
 }
