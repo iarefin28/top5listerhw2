@@ -12,9 +12,10 @@ import Workspace from './components/Workspace.js';
 import Statusbar from './components/Statusbar.js'
 
 class App extends React.Component {
+    listToDelete = null;
+
     constructor(props) {
         super(props);
-
         // THIS WILL TALK TO LOCAL STORAGE
         this.db = new DBManager();
 
@@ -129,6 +130,7 @@ class App extends React.Component {
             sessionData: prevState.sessionData
         }), () => {
             // ANY AFTER EFFECTS?
+            
         });
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
@@ -148,7 +150,38 @@ class App extends React.Component {
         // NAME PROPERLY DISPLAYS INSIDE THE MODAL
         //listToDelete contains the Object of the list to delete
         this.showDeleteListModal(listToDelete.name);
+        Window.listToDelete = listToDelete;
+        
     }
+
+    deleteListForever = () => {
+        let keyNamePairsNew = this.state.sessionData.keyNamePairs;
+        console.log(keyNamePairsNew);
+        for(let i = 0; i < keyNamePairsNew.length; i++){
+            if(keyNamePairsNew[i] === Window.listToDelete){
+                keyNamePairsNew.splice(i, 1);
+            }
+        }
+        this.sortKeyNamePairsByName(keyNamePairsNew);
+
+        this.setState(prevState => ({
+            sessionData: {
+                nextKey: prevState.sessionData.nextKey + 1,
+                keyNamePairs: keyNamePairsNew
+            }
+        }), () => {
+            // PUTTING THIS NEW LIST IN PERMANENT STORAGE
+            // IS AN AFTER EFFECT
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+        }); 
+
+        this.hideDeleteListModal();
+    }
+
+    obtainListToDelete(listToDelete){
+        return listToDelete;
+    }
+
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
     // TO SEE IF THEY REALLY WANT TO DELETE THE LIST
     showDeleteListModal(name) {
@@ -216,6 +249,7 @@ class App extends React.Component {
                     currentList={this.state.currentList} />
                 <DeleteModal
                     hideDeleteListModalCallback={this.hideDeleteListModal}
+                    deleteListCallback={this.deleteListForever}
                 />
             </div>
         );
