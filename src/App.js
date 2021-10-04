@@ -119,19 +119,36 @@ class App extends React.Component {
         this.tps.addTransaction(transaction);
     }
 
+    addMoveItemTransaction = (oldIndex, newIndex) => {
+        let transaction = new MoveItem_Transaction(oldIndex, newIndex);
+        this.tps.addTransaction(transaction);
+    }
+
     undo = () => {
         let a = this.tps.undoTransaction();
-        this.undoRenameItem(a.newText, a.oldText);
+        if(a !== undefined){
+            if(a.hasOwnProperty('oldText')){
+                this.undoRenameItem(a.newText, a.oldText);
+            }
+            else{
+                this.undoDragAndDrop(a.newItemIndex, a.oldItemIndex);
+            }
+        }
     }
 
     redo = () => {
         let a = this.tps.redoTransaction();
-        this.undoRenameItem(a.oldText, a.newText);
+        if(a !== undefined){
+            if(a.hasOwnProperty('oldText')){
+                this.undoRenameItem(a.oldText, a.newText);
+            }
+            else{
+                this.undoDragAndDrop(a.oldItemIndex, a.newItemIndex);
+            }
+        }
     }
 
-
     renameItem = (item_number, newName) => {
-
         let currentList = this.state.currentList;
         this.addChangeItemTransaction(currentList.items[item_number], newName);
         currentList.items[item_number] = newName;
@@ -258,12 +275,27 @@ class App extends React.Component {
             }
         }
 
+        this.addMoveItemTransaction(indexOfFirst, indexOfSecond);
         currentListItems.splice(indexOfSecond, 0, currentListItems.splice(indexOfFirst, 1)[0]);
         this.setState(prevState => ({
             currentList: prevState.currentList,
         }), () => {
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
             // THE TRANSACTION STACK IS CLEARED
+            let list = this.db.queryGetList(currentList.key);
+            list.items = currentListItems;
+            this.db.mutationUpdateList(list);
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+        });
+    }
+
+    undoDragAndDrop = (index1, index2) => {
+        let currentList = this.state.currentList;
+        let currentListItems = this.state.currentList.items;
+        currentListItems.splice(index2, 0, currentListItems.splice(index1, 1)[0]);
+        this.setState(prevState => ({
+            currentList: prevState.currentList,
+        }), () => {
             let list = this.db.queryGetList(currentList.key);
             list.items = currentListItems;
             this.db.mutationUpdateList(list);
@@ -317,4 +349,18 @@ class ChangeItem_Transaction extends jsTPS_Transaction {
     undoTransaction(){
     }
     
+}
+
+class MoveItem_Transaction extends jsTPS_Transaction {
+    constructor(initOldIndex, initNewIndex) {
+        super();
+        this.oldItemIndex = initOldIndex;
+        this.newItemIndex = initNewIndex;
+    }
+
+    doTransaction() {
+    }
+    
+    undoTransaction() {
+    }
 }
