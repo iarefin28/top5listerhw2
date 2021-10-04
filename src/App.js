@@ -3,6 +3,9 @@ import './App.css';
 
 // IMPORT DATA MANAGEMENT AND TRANSACTION STUFF
 import DBManager from './db/DBManager';
+import jsTPS from './common/jsTPS';
+import { jsTPS_Transaction } from './common/jsTPS';
+
 
 // THESE ARE OUR REACT COMPONENTS
 import DeleteModal from './components/DeleteModal';
@@ -11,13 +14,17 @@ import Sidebar from './components/Sidebar.js'
 import Workspace from './components/Workspace.js';
 import Statusbar from './components/Statusbar.js'
 
+
+
 class App extends React.Component {
     listToDelete = null;
+    //tps = new jsTPS();
 
     constructor(props) {
         super(props);
         // THIS WILL TALK TO LOCAL STORAGE
         this.db = new DBManager();
+        this.tps = new jsTPS();
 
         // GET THE SESSION DATA FROM OUR DATA MANAGER
         let loadedSessionData = this.db.queryGetSessionData();
@@ -106,8 +113,27 @@ class App extends React.Component {
             this.db.mutationUpdateSessionData(this.state.sessionData);
         });
     }
+
+    addChangeItemTransaction = (oldText, newText) => {
+        let transaction = new ChangeItem_Transaction(oldText, newText);
+        this.tps.addTransaction(transaction);
+    }
+
+    undo = () => {
+        let a = this.tps.undoTransaction();
+        this.undoRenameItem(a.newText, a.oldText);
+    }
+
+    redo = () => {
+        let a = this.tps.redoTransaction();
+        this.undoRenameItem(a.oldText, a.newText);
+    }
+
+
     renameItem = (item_number, newName) => {
+
         let currentList = this.state.currentList;
+        this.addChangeItemTransaction(currentList.items[item_number], newName);
         currentList.items[item_number] = newName;
         
         this.setState(prevState => ({
@@ -122,6 +148,23 @@ class App extends React.Component {
         });
     }
 
+    undoRenameItem = (currentName, oldName) => {
+        let currentList = this.state.currentList;
+        for(let i = 0; i < currentList.items.length; i++){
+            if(currentList.items[i] === currentName){
+                currentList.items[i] = oldName;
+            }
+        }
+        
+        this.setState(prevState => ({
+            currentList: currentList,
+        }), () => {
+            let list = this.db.queryGetList(currentList.key);
+            list.items = currentList.items;
+            this.db.mutationUpdateList(list);
+            this.db.mutationUpdateSessionData(this.state.sessionData);
+        }); 
+    }
 
     // THIS FUNCTION BEGINS THE PROCESS OF LOADING A LIST FOR EDITING
     loadList = (key) => {
@@ -232,7 +275,9 @@ class App extends React.Component {
             <div id="app-root">
                 <Banner 
                     title='Top 5 Lister'
-                    closeCallback={this.closeCurrentList} />
+                    closeCallback={this.closeCurrentList} 
+                    undoCallback={this.undo}
+                    redoCallback={this.redo}/>
                 <Sidebar
                     heading='Your Lists'
                     currentList={this.state.currentList}
@@ -259,3 +304,17 @@ class App extends React.Component {
 }
 
 export default App;
+
+class ChangeItem_Transaction extends jsTPS_Transaction {
+    constructor(initOldText, initNewText) {
+        super();
+        this.oldText = initOldText;
+        this.newText = initNewText;
+    }
+    doTransaction(){
+
+    }
+    undoTransaction(){
+    }
+    
+}
