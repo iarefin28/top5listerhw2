@@ -316,6 +316,18 @@ input {
   float: right;
 }
 
+#close-button {
+  opacity: 0.2;
+}
+
+#undo-button {
+  opacity: 0.2;
+}
+
+#redo-button {
+  opacity: 0.2;
+}
+
 #confirm-cancel-container {
   text-align: center;
 }

@@ -79,6 +79,9 @@ class App extends React.Component {
             // IS AN AFTER EFFECT
             this.db.mutationCreateList(newList);
             this.db.mutationUpdateSessionData(this.state.sessionData);
+
+            document.getElementById("add-list-button").disabled = true;
+            document.getElementById("add-list-button").style.opacity = 0.2;
         });
     }
     renameList = (key, newName) => {
@@ -108,6 +111,7 @@ class App extends React.Component {
         }), () => {
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
             // THE TRANSACTION STACK IS CLEARED
+            this.tps.clearAllTransactions();
             let list = this.db.queryGetList(key);
             list.name = newName;
             this.db.mutationUpdateList(list);
@@ -126,13 +130,22 @@ class App extends React.Component {
     }
 
     undo = () => {
-        let a = this.tps.undoTransaction();
-        if(a !== undefined){
-            if(a.hasOwnProperty('oldText')){
-                this.undoRenameItem(a.newText, a.oldText);
+        console.log(this.state.currentList);
+        if(this.state.currentList !== null){
+            let a = this.tps.undoTransaction();
+            if(a !== undefined){
+                if(a.hasOwnProperty('oldText')){
+                    this.undoRenameItem(a.newText, a.oldText);
+                }
+                else{
+                    this.undoDragAndDrop(a.newItemIndex, a.oldItemIndex);
+                }
+                let redoButton = document.getElementById("redo-button");
+                redoButton.style.opacity = 1.0;
             }
-            else{
-                this.undoDragAndDrop(a.newItemIndex, a.oldItemIndex);
+            if(!this.tps.hasTransactionToUndo()){
+                let undoButton = document.getElementById("undo-button");
+                undoButton.style.opacity = 0.2;
             }
         }
     }
@@ -146,6 +159,12 @@ class App extends React.Component {
             else{
                 this.undoDragAndDrop(a.oldItemIndex, a.newItemIndex);
             }
+            let undoButton = document.getElementById("undo-button");
+            undoButton.style.opacity = 1.0;
+        }
+        if(!this.tps.hasTransactionToRedo()){
+            let redoButton = document.getElementById("redo-button");
+            redoButton.style.opacity = 0.2;
         }
     }
 
@@ -163,6 +182,10 @@ class App extends React.Component {
             list.items[item_number] = newName;
             this.db.mutationUpdateList(list);
             this.db.mutationUpdateSessionData(this.state.sessionData);
+
+            //make undo available
+            let undoButton = document.getElementById("undo-button");
+            undoButton.style.opacity = 1.0;
         });
     }
 
@@ -191,8 +214,18 @@ class App extends React.Component {
             currentList: newCurrentList,
             sessionData: prevState.sessionData
         }), () => {
-            // ANY AFTER EFFECTS?
-            
+            this.tps.clearAllTransactions();
+            let closeButton = document.getElementById("close-button");
+            closeButton.style.opacity = 1.0;
+            let undoButton = document.getElementById("undo-button");
+            undoButton.style.opacity = 0.1;
+            let redoButton = document.getElementById("redo-button");
+            redoButton.style.opacity = 0.1;
+            this.tps.clearAllTransactions();
+
+            //disable add list button 
+            document.getElementById("add-list-button").disabled = true;
+            document.getElementById("add-list-button").style.opacity = 0.2;
         });
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
@@ -202,7 +235,16 @@ class App extends React.Component {
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
             sessionData: this.state.sessionData
         }), () => {
-            // ANY AFTER EFFECTS?
+            let closeButton = document.getElementById("close-button");
+            closeButton.style.opacity = 0.1;
+            let undoButton = document.getElementById("undo-button");
+            undoButton.style.opacity = 0.1;
+            let redoButton = document.getElementById("redo-button");
+            redoButton.style.opacity = 0.1;
+            this.tps.clearAllTransactions();
+
+            document.getElementById("add-list-button").disabled = false;
+            document.getElementById("add-list-button").style.opacity = 1.0;
         });
     }
     deleteList = (listToDelete) => {
@@ -236,6 +278,8 @@ class App extends React.Component {
             // PUTTING THIS NEW LIST IN PERMANENT STORAGE
             // IS AN AFTER EFFECT
             this.db.mutationUpdateSessionData(this.state.sessionData);
+            document.getElementById("add-list-button").disabled = false;
+            document.getElementById("add-list-button").style.opacity = 1.0;
         }); 
 
         this.hideDeleteListModal();
@@ -287,6 +331,9 @@ class App extends React.Component {
             list.items = currentListItems;
             this.db.mutationUpdateList(list);
             this.db.mutationUpdateSessionData(this.state.sessionData);
+
+            let undoButton = document.getElementById("undo-button");
+            undoButton.style.opacity = 1.0;
         });
     }
 
