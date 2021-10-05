@@ -18,6 +18,7 @@ import Statusbar from './components/Statusbar.js'
 
 class App extends React.Component {
     listToDelete = null;
+    ctrlPressed = false;
     //tps = new jsTPS();
 
     constructor(props) {
@@ -302,9 +303,43 @@ class App extends React.Component {
             this.db.mutationUpdateSessionData(this.state.sessionData);
         });
     }
+    componentWillMount(){
+        document.addEventListener("keydown", this.undoRedoKeyboardAction.bind(this));
+        document.addEventListener("keydown", this.ctrlIsActive.bind(this));
+        document.addEventListener("keyup", this.ctrlInactive.bind(this));
+    }
+
+    componentWillUnmount(){
+        document.removeEventListener("keydown", this.undoRedoKeyboardAction.bind(this));
+        document.removeEventListener("keydown", this.ctrlIsActive.bind(this));
+        document.removeEventListener("keyup", this.ctrlInactive.bind(this));
+    }
+
+    ctrlIsActive = (event) => {
+        if(event.keyCode == 17){
+            Window.ctrlPressed = true;
+        }
+    }
+
+    ctrlInactive = (event) => {
+        Window.ctrlPressed = false;
+    }
+
+    undoRedoKeyboardAction = (event) => {
+        if(Window.ctrlPressed){
+            if(event.keyCode === 90){
+                this.undo();
+            }
+            if(event.keyCode === 89){
+                this.redo();
+            }
+        }
+    }
+
+
     render() {
         return (
-            <div id="app-root">
+            <div id="app-root" onKeyDown={this.undoKeyboardAction}>
                 <Banner 
                     title='Top 5 Lister'
                     closeCallback={this.closeCurrentList} 
